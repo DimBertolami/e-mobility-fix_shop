@@ -38,7 +38,7 @@ export default function BatteryPackCalculator() {
 
   const calculate = () => {
     const totalVoltage = inputs.series * inputs.volt;
-    const totalAh = (inputs.parallel * inputs.ah) / 1000;
+    const totalAh = inputs.parallel * inputs.ah;
     const totalCells = inputs.series * inputs.parallel;
     const deckVolume = (inputs.height * inputs.length * inputs.width) / 1000;
 
