@@ -182,7 +182,7 @@ export default function BatteryPackCalculator() {
                 </div>
                 <div className="bg-gradient-to-br from-blue-500/20 to-cyan-500/20 p-4 rounded-xl border border-blue-400/30">
                   <p className="text-blue-200 text-sm">Total Capacity</p>
-                  <p className="text-3xl font-bold text-white">{results.totalAh}Wh</p>
+                  <p className="text-3xl font-bold text-white">{results.totalAh}Ah</p>
                 </div>
                 <div className="bg-gradient-to-br from-green-500/20 to-emerald-500/20 p-4 rounded-xl border border-green-400/30">
                   <p className="text-green-200 text-sm">Total Cells</p>
