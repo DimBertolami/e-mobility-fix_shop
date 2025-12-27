@@ -33,6 +33,16 @@ jobs:
       - name: Build
         run: npm run build
 
+      - name: Add SPA fallback (index -> 404)
+        run: |
+          if [ -f "dist/index.html" ]; then
+            cp dist/index.html dist/404.html
+            echo "Created dist/404.html for SPA fallback"
+          else
+            echo "dist/index.html not found — build may have failed"
+            exit 1
+          fi
+
       - name: Deploy to gh-pages branch using peaceiris
         uses: peaceiris/actions-gh-pages@v3
         with:
