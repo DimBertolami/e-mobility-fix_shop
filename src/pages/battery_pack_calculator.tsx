@@ -88,7 +88,7 @@ export default function BatteryPackCalculator() {
                   </div>
                   <div>
                     <label className="block text-purple-200 text-sm font-medium mb-2">
-                      Capacity (Ah)
+                      Capacity per Cell (Ah)
                     </label>
                     <input
                       type="number"
