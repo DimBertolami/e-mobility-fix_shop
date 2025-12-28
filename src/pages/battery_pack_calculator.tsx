@@ -24,9 +24,9 @@ export default function BatteryPackCalculator() {
     ah: 2.8,
     series: 13,
     parallel: 8,
-    height: 10,
-    length: 75,
-    width: 20
+    height: 7.5,
+    length: 30.5,
+    width: 14.5
   });
 
   const [results, setResults] = useState<ResultState | null>(null);
@@ -126,7 +126,7 @@ export default function BatteryPackCalculator() {
               <div>
                 <h2 className="text-2xl font-bold text-white mb-4 flex items-center gap-2">
                   <Box className="w-6 h-6 text-blue-400" />
-                  Deck Dimensions
+                  Battery Size
                 </h2>
                 <div className="grid grid-cols-3 gap-4">
                   <div>
