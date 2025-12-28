@@ -1,5 +1,6 @@
 import { useState } from 'react';
 import { Battery, Zap, Box } from 'lucide-react';
+import { useLanguage } from '../LanguageContext';
 
 interface InputState {
   volt: number;
@@ -19,6 +20,7 @@ interface ResultState {
 }
 
 export default function BatteryPackCalculator() {
+  const { t } = useLanguage();
   const [inputs, setInputs] = useState<InputState>({
     volt: 3.7,
     ah: 2.8,
@@ -59,9 +61,9 @@ export default function BatteryPackCalculator() {
         <div className="text-center mb-12">
           <div className="flex items-center justify-center gap-3 mb-4">
             <Battery className="w-12 h-12 text-purple-400" />
-            <h1 className="text-5xl font-bold text-white">Battery Pack Designer</h1>
+            <h1 className="text-5xl font-bold text-white">{t('batteryPackDesigner')}</h1>
           </div>
-          <p className="text-purple-200 text-lg">Design custom battery packs for electric vehicles</p>
+          <p className="text-purple-200 text-lg">{t('designCustomBatteryPacks')}</p>
         </div>
 
         <div className="grid lg:grid-cols-2 gap-8">
@@ -71,12 +73,12 @@ export default function BatteryPackCalculator() {
               <div>
                 <h2 className="text-2xl font-bold text-white mb-4 flex items-center gap-2">
                   <Zap className="w-6 h-6 text-yellow-400" />
-                  Battery Specifications
+                  {t('batterySpecifications')}
                 </h2>
                 <div className="grid grid-cols-2 gap-4">
                   <div>
                     <label className="block text-purple-200 text-sm font-medium mb-2">
-                      Voltage per Cell (V)
+                      {t('voltagePerCell')}
                     </label>
                     <input
                       type="number"
@@ -100,7 +102,7 @@ export default function BatteryPackCalculator() {
                   </div>
                   <div>
                     <label className="block text-purple-200 text-sm font-medium mb-2">
-                      Cells in Series
+                      {t('cellsInSeries')}
                     </label>
                     <input
                       type="number"
@@ -111,7 +113,7 @@ export default function BatteryPackCalculator() {
                   </div>
                   <div>
                     <label className="block text-purple-200 text-sm font-medium mb-2">
-                      Cells in Parallel
+                      {t('cellsInParallel')}
                     </label>
                     <input
                       type="number"
@@ -126,12 +128,12 @@ export default function BatteryPackCalculator() {
               <div>
                 <h2 className="text-2xl font-bold text-white mb-4 flex items-center gap-2">
                   <Box className="w-6 h-6 text-blue-400" />
-                  Battery Size
+                  {t('batterySize')}
                 </h2>
                 <div className="grid grid-cols-3 gap-4">
                   <div>
                     <label className="block text-purple-200 text-sm font-medium mb-2">
-                      Height (cm)
+                      {t('height')}
                     </label>
                     <input
                       type="number"
@@ -142,7 +144,7 @@ export default function BatteryPackCalculator() {
                   </div>
                   <div>
                     <label className="block text-purple-200 text-sm font-medium mb-2">
-                      Length (cm)
+                      {t('length')}
                     </label>
                     <input
                       type="number"
@@ -153,7 +155,7 @@ export default function BatteryPackCalculator() {
                   </div>
                   <div>
                     <label className="block text-purple-200 text-sm font-medium mb-2">
-                      Width (cm)
+                      {t('width')}
                     </label>
                     <input
                       type="number"
@@ -169,7 +171,7 @@ export default function BatteryPackCalculator() {
                 onClick={calculate}
                 className="w-full bg-gradient-to-r from-purple-600 to-pink-600 hover:from-purple-700 hover:to-pink-700 text-white font-bold py-4 px-8 rounded-xl shadow-lg transform transition hover:scale-105"
               >
-                Calculate Pack
+                {t('calculatePack')}
               </button>
             </div>
 
@@ -177,19 +179,19 @@ export default function BatteryPackCalculator() {
             {results && (
               <div className="mt-8 grid grid-cols-2 gap-4">
                 <div className="bg-gradient-to-br from-purple-500/20 to-pink-500/20 p-4 rounded-xl border border-purple-400/30">
-                  <p className="text-purple-200 text-sm">Total Voltage</p>
+                  <p className="text-purple-200 text-sm">{t('totalVoltage')}</p>
                   <p className="text-3xl font-bold text-white">{results.totalVoltage}V</p>
                 </div>
                 <div className="bg-gradient-to-br from-blue-500/20 to-cyan-500/20 p-4 rounded-xl border border-blue-400/30">
-                  <p className="text-blue-200 text-sm">Total Capacity</p>
+                  <p className="text-blue-200 text-sm">{t('totalCapacity')}</p>
                   <p className="text-3xl font-bold text-white">{results.totalAh}Ah</p>
                 </div>
                 <div className="bg-gradient-to-br from-green-500/20 to-emerald-500/20 p-4 rounded-xl border border-green-400/30">
-                  <p className="text-green-200 text-sm">Total Cells</p>
+                  <p className="text-green-200 text-sm">{t('totalCells')}</p>
                   <p className="text-3xl font-bold text-white">{results.totalCells}</p>
                 </div>
                 <div className="bg-gradient-to-br from-orange-500/20 to-yellow-500/20 p-4 rounded-xl border border-orange-400/30">
-                  <p className="text-orange-200 text-sm">Deck Volume</p>
+                  <p className="text-orange-200 text-sm">{t('deckVolume')}</p>
                   <p className="text-3xl font-bold text-white">{results.deckVolume}L</p>
                 </div>
               </div>
@@ -198,7 +200,7 @@ export default function BatteryPackCalculator() {
 
           {/* Visualization Section */}
           <div className="bg-white/10 backdrop-blur-lg rounded-2xl p-8 shadow-2xl border border-white/20">
-            <h2 className="text-2xl font-bold text-white mb-6 text-center">Cell Configuration</h2>
+            <h2 className="text-2xl font-bold text-white mb-6 text-center">{t('cellConfiguration')}</h2>
             {results ? (
               <div className="flex items-center justify-center">
                 <svg
@@ -312,17 +314,17 @@ export default function BatteryPackCalculator() {
               <div className="flex items-center justify-center h-96 text-purple-300">
                 <div className="text-center">
                   <Battery className="w-24 h-24 mx-auto mb-4 opacity-50" />
-                  <p className="text-xl">Enter specifications and click Calculate</p>
+                  <p className="text-xl">{t('enterSpecifications')}</p>
                 </div>
               </div>
             )}
 
             {results && (
               <div className="mt-6 bg-purple-500/20 p-4 rounded-xl border border-purple-400/30">
-                <p className="text-purple-200 text-sm mb-2">Configuration:</p>
+                <p className="text-purple-200 text-sm mb-2">{t('configuration')}:</p>
                 <p className="text-white font-mono">{inputs.series}S{inputs.parallel}P Pack</p>
                 <p className="text-purple-200 text-xs mt-2">
-                  {inputs.series} cells in series (horizontal) × {inputs.parallel} parallel groups (vertical)
+                  {inputs.series} {t('cellsInSeriesDesc')} {inputs.parallel} {t('parallelGroupsDesc')}
                 </p>
               </div>
             )}

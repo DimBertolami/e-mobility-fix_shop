@@ -1,62 +1,63 @@
 import { useState } from 'react';
-import { 
-  Battery, 
-  CircleDot, 
-  Settings, 
-  Cpu, 
-  Disc, 
-  Wrench, 
+import {
+  Battery,
+  CircleDot,
+  Settings,
+  Cpu,
+  Disc,
+  Wrench,
   MessageSquare,
   ChevronRight,
   Bike,
   Zap
 } from 'lucide-react';
+import { useLanguage } from '../LanguageContext';
 
 const SERVICES = [
   {
     id: 'revisie',
-    title: 'Batterij revisie',
-    desc: 'Volledige revisie van Li-Ion & Li-Po batterijen. We geven je accu nieuw leven met kwaliteitscellen.',
+    titleKey: 'batteryRevision',
+    descKey: 'batteryRevisionDesc',
     icon: Battery,
     color: 'text-purple-400',
     bg: 'bg-purple-500/10'
   },
   {
     id: 'banden',
-    title: 'Banden-reparatie',
-    desc: 'Lekke band? Wij repareren of vervangen je banden snel en vakkundig.',
+    titleKey: 'tireRepair',
+    descKey: 'tireRepairDesc',
     icon: CircleDot,
     color: 'text-blue-400',
     bg: 'bg-blue-500/10'
   },
   {
     id: 'motor',
-    title: 'Motor-reparatie',
-    desc: 'Diagnose en reparatie van hub motors en andere elektrische aandrijvingen.',
+    titleKey: 'motorRepair',
+    descKey: 'motorRepairDesc',
     icon: Settings,
     color: 'text-yellow-400',
     bg: 'bg-yellow-500/10'
   },
   {
     id: 'electronica',
-    title: 'Controller & Electronica',
-    desc: 'Reparatie van controllers, displays en andere elektronica componenten.',
+    titleKey: 'controllerElectronics',
+    descKey: 'controllerElectronicsDesc',
     icon: Cpu,
     color: 'text-emerald-400',
     bg: 'bg-emerald-500/10'
   },
   {
     id: 'remmen',
-    title: 'Remmen',
-    desc: 'Volledige rem service inclusief schijfremmen, trommelremmen en hydraulische systemen.',
+    titleKey: 'brakes',
+    descKey: 'brakesDesc',
     icon: Disc,
     color: 'text-red-400',
     bg: 'bg-red-500/10'
   },
   {
     id: 'onderhoud',
-    title: 'Onderhoud',
-    desc: 'Complete check-up en onderhoud voor optimale prestaties en veiligheid.',
+    titleKey: 'maintenance',
+    descKey: 'maintenanceDesc',
     icon: Wrench,
     color: 'text-orange-400',
     bg: 'bg-orange-500/10'
@@ -64,13 +65,14 @@ const SERVICES = [
 ];
 
 const CATEGORIES = [
-  'E-steps & Scooters',
-  'E-bikes',
-  'Monowheels',
-  'Hoverboards'
-];
+  'eSteps',
+  'eBikes',
+  'monowheels',
+  'hoverboards'
+] as const;
 
 export default function ServicePage() {
+  const { t } = useLanguage();
   const [selectedService, setSelectedService] = useState<string | null>(null);
   const [selectedCategory, setSelectedCategory] = useState<string>('');
 
@@ -82,10 +84,10 @@ export default function ServicePage() {
             <Zap className="w-8 h-8 text-yellow-400" />
           </div>
           <h1 className="text-4xl md:text-6xl font-black text-white mb-4 tracking-tight">
-            SERVICE & <span className="text-purple-400">REPARATIE</span>
+            {t('serviceRepair')}
           </h1>
           <p className="text-purple-200/70 text-lg max-w-2xl mx-auto">
-            Kies uw voertuig en de gewenste dienst voor een snelle en vakkundige oplossing.
+            {t('selectVehicleAndService')}
           </p>
         </header>
 
@@ -93,20 +95,20 @@ export default function ServicePage() {
         <section className="mb-12">
           <h2 className="text-white text-xl font-bold mb-6 flex items-center gap-2">
             <Bike className="w-5 h-5 text-purple-400" />
-            1. Selecteer Voertuig
+            {t('selectVehicle')}
           </h2>
           <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
-            {CATEGORIES.map((cat) => (
+            {CATEGORIES.map((catKey) => (
               <button
-                key={cat}
-                onClick={() => setSelectedCategory(cat)}
+                key={catKey}
+                onClick={() => setSelectedCategory(catKey)}
                 className={`py-4 px-6 rounded-xl border text-sm font-bold transition-all ${
-                  selectedCategory === cat 
-                  ? 'bg-purple-500 border-purple-400 text-white shadow-[0_0_20px_rgba(168,85,247,0.4)]' 
+                  selectedCategory === catKey
+                  ? 'bg-purple-500 border-purple-400 text-white shadow-[0_0_20px_rgba(168,85,247,0.4)]'
                   : 'bg-white/5 border-white/10 text-purple-200 hover:bg-white/10'
                 }`}
               >
-                {cat}
+                {t(catKey)}
               </button>
             ))}
           </div>
@@ -116,7 +118,7 @@ export default function ServicePage() {
         <section className="mb-16">
           <h2 className="text-white text-xl font-bold mb-6 flex items-center gap-2">
             <Wrench className="w-5 h-5 text-purple-400" />
-            2. Selecteer Dienst
+            {t('selectService')}
           </h2>
           <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-6">
             {SERVICES.map((service) => {
@@ -135,8 +137,8 @@ export default function ServicePage() {
                   <div className={`w-14 h-14 rounded-2xl ${service.bg} flex items-center justify-center mb-6 group-hover:scale-110 transition-transform`}>
                     <Icon className={`w-7 h-7 ${service.color}`} />
                   </div>
-                  <h3 className="text-xl font-bold text-white mb-3">{service.title}</h3>
-                  <p className="text-purple-200/60 text-sm leading-relaxed">{service.desc}</p>
+                  <h3 className="text-xl font-bold text-white mb-3">{t(service.titleKey)}</h3>
+                  <p className="text-purple-200/60 text-sm leading-relaxed">{t(service.descKey)}</p>
                 </button>
               );
             })}
@@ -147,13 +149,13 @@ export default function ServicePage() {
                 <div className="w-14 h-14 rounded-2xl bg-white/5 flex items-center justify-center mb-6">
                   <MessageSquare className="w-7 h-7 text-white/50" />
                 </div>
-                <h3 className="text-xl font-bold text-white mb-3">Andere</h3>
+                <h3 className="text-xl font-bold text-white mb-3">{t('other')}</h3>
                 <p className="text-purple-200/60 text-sm leading-relaxed">
-                  Staat jouw probleem er niet bij? Neem direct contact op voor maatwerk.
+                  {t('otherDesc')}
                 </p>
               </div>
               <button className="mt-8 w-full py-4 bg-white/10 hover:bg-white/20 text-white font-bold rounded-2xl transition-all flex items-center justify-center gap-2">
-                Contact opnemen
+                {t('contactUs2')}
               </button>
             </div>
           </div>
@@ -163,7 +165,7 @@ export default function ServicePage() {
         {selectedService && selectedCategory && (
           <div className="fixed bottom-8 left-1/2 -translate-x-1/2 w-full max-w-md px-4 animate-in fade-in slide-in-from-bottom-8">
             <button className="w-full bg-purple-500 hover:bg-purple-400 text-white py-5 rounded-2xl font-black text-lg shadow-[0_10px_40px_rgba(168,85,247,0.4)] flex items-center justify-center gap-3 transition-all">
-              AANVRAAG AFRONDEN
+              {t('finishRequest')}
               <ChevronRight className="w-6 h-6" />
             </button>
           </div>
