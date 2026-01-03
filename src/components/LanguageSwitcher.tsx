@@ -1,13 +1,16 @@
 import { useLanguage } from '../LanguageContext';
 import { Language } from '../translations';
+import ukFlag from '../images/Flag_United_Kingdom.png';
+import frFlag from '../images/flag_france.png';
+import beFlag from '../images/flag_belgium.png';
 
 export function LanguageSwitcher() {
   const { language, setLanguage } = useLanguage();
 
   const languages: { code: Language; flag: string; label: string }[] = [
-    { code: 'en', flag: '🇬🇧', label: 'EN' },
-    { code: 'fr', flag: '🇫🇷', label: 'FR' },
-    { code: 'nl', flag: '🇧🇪', label: 'NL' },
+    { code: 'en', flag: ukFlag, label: 'EN' },
+    { code: 'fr', flag: frFlag, label: 'FR' },
+    { code: 'nl', flag: beFlag, label: 'NL' },
   ];
 
   return (
@@ -23,7 +26,7 @@ export function LanguageSwitcher() {
           }`}
           title={lang.label}
         >
-          <span className="text-lg">{lang.flag}</span>
+          <img src={lang.flag} alt={lang.label} className="w-5 h-4" />
         </button>
       ))}
     </div>
