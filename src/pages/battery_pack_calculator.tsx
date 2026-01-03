@@ -10,6 +10,7 @@ interface InputState {
   height: number;
   length: number;
   width: number;
+  cellSize: string;
 }
 
 interface ResultState {
@@ -17,7 +18,23 @@ interface ResultState {
   totalAh: string;
   totalCells: number;
   deckVolume: string;
+  cellsFit: number;
 }
+
+interface CellSizeInfo {
+  id: string;
+  label: string;
+  diameterMm: number;
+  heightMm: number;
+}
+
+const CELL_SIZES: CellSizeInfo[] = [
+  { id: '32650', label: '32650', diameterMm: 32, heightMm: 65 },
+  { id: '26650', label: '26650', diameterMm: 26, heightMm: 65 },
+  { id: '21700', label: '21700', diameterMm: 21, heightMm: 70 },
+  { id: '18650', label: '18650', diameterMm: 18, heightMm: 65 },
+  { id: '14500', label: '14500', diameterMm: 14, heightMm: 50 }
+];
 
 export default function BatteryPackCalculator() {
   const { t } = useLanguage();
@@ -28,14 +45,33 @@ export default function BatteryPackCalculator() {
     parallel: 8,
     height: 7.5,
     length: 30.5,
-    width: 14.5
+    width: 14.5,
+    cellSize: '18650'
   });
 
   const [results, setResults] = useState<ResultState | null>(null);
   const [showFlow, setShowFlow] = useState(false);
 
   const handleInputChange = (field: keyof InputState, value: string) => {
-    setInputs(prev => ({ ...prev, [field]: parseFloat(value) || 0 }));
+    if (field === 'cellSize') {
+      setInputs(prev => ({ ...prev, [field]: value }));
+    } else {
+      setInputs(prev => ({ ...prev, [field]: parseFloat(value) || 0 }));
+    }
+  };
+
+  const calculateCellsFit = (): number => {
+    const cellSize = CELL_SIZES.find(cs => cs.id === inputs.cellSize);
+    if (!cellSize) return 0;
+
+    const cellDiameterCm = cellSize.diameterMm / 10;
+    const cellHeightCm = cellSize.heightMm / 10;
+
+    const cellsAlongHeight = Math.floor(inputs.height / cellHeightCm);
+    const cellsAlongLength = Math.floor(inputs.length / cellDiameterCm);
+    const cellsAlongWidth = Math.floor(inputs.width / cellDiameterCm);
+
+    return cellsAlongHeight * cellsAlongLength * cellsAlongWidth;
   };
 
   const calculate = () => {
@@ -43,12 +79,14 @@ export default function BatteryPackCalculator() {
     const totalAh = inputs.parallel * inputs.ah;
     const totalCells = inputs.series * inputs.parallel;
     const deckVolume = (inputs.height * inputs.length * inputs.width) / 1000;
+    const cellsFit = calculateCellsFit();
 
     setResults({
       totalVoltage: totalVoltage.toFixed(2),
       totalAh: totalAh.toFixed(2),
       totalCells,
-      deckVolume: deckVolume.toFixed(2)
+      deckVolume: deckVolume.toFixed(2),
+      cellsFit
     });
 
     setShowFlow(false);
@@ -167,6 +205,37 @@ export default function BatteryPackCalculator() {
                 </div>
               </div>
 
+              <div>
+                <h2 className="text-2xl font-bold text-white mb-4 flex items-center gap-2">
+                  <Battery className="w-6 h-6 text-cyan-400" />
+                  {t('cellSizes')}
+                </h2>
+                <div className="relative">
+                  <label className="block text-purple-200 text-sm font-medium mb-2">
+                    {t('cellSize')}
+                  </label>
+                  <select
+                    value={inputs.cellSize}
+                    onChange={(e) => handleInputChange('cellSize', e.target.value)}
+                    className="w-full px-4 py-3 bg-white/5 border border-purple-300/30 rounded-lg text-white focus:outline-none focus:ring-2 focus:ring-purple-500 appearance-none cursor-pointer"
+                  >
+                    {CELL_SIZES.map(cellSize => (
+                      <option key={cellSize.id} value={cellSize.id} title={`${cellSize.diameterMm}mm Ø, ${cellSize.heightMm}mm H`}>
+                        {cellSize.label} ({cellSize.diameterMm}mm Ø, {cellSize.heightMm}mm H)
+                      </option>
+                    ))}
+                  </select>
+                  <div className="pointer-events-none absolute right-3 top-11 flex items-center px-2 text-purple-200">
+                    <svg className="fill-current h-4 w-4" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20">
+                      <path d="M9.293 12.95l.707.707L15.657 8l-1.414-1.414L10 10.828 5.757 6.586 4.343 8z" />
+                    </svg>
+                  </div>
+                </div>
+                <p className="text-purple-200/60 text-xs mt-3">
+                  {t('cellsFit')}: <span className="text-white font-semibold">{calculateCellsFit()}</span>
+                </p>
+              </div>
+
               <button
                 onClick={calculate}
                 className="w-full bg-gradient-to-r from-purple-600 to-pink-600 hover:from-purple-700 hover:to-pink-700 text-white font-bold py-4 px-8 rounded-xl shadow-lg transform transition hover:scale-105"
@@ -200,6 +269,15 @@ export default function BatteryPackCalculator() {
 
           {/* Visualization Section */}
           <div className="bg-white/10 backdrop-blur-lg rounded-2xl p-8 shadow-2xl border border-white/20">
+            {results && (
+              <div className="mb-8 bg-cyan-500/20 p-4 rounded-xl border border-cyan-400/30">
+                <p className="text-cyan-200 text-sm mb-2">{t('cellsFit')}:</p>
+                <p className="text-white font-mono text-2xl font-bold">{results.cellsFit}</p>
+                <p className="text-cyan-200/70 text-xs mt-2">
+                  Based on {inputs.cellSize} cells ({CELL_SIZES.find(cs => cs.id === inputs.cellSize)?.diameterMm}mm Ø × {CELL_SIZES.find(cs => cs.id === inputs.cellSize)?.heightMm}mm H) in pack size {inputs.height}cm × {inputs.length}cm × {inputs.width}cm
+                </p>
+              </div>
+            )}
             <h2 className="text-2xl font-bold text-white mb-6 text-center">{t('cellConfiguration')}</h2>
             {results ? (
               <div className="flex items-center justify-center">
