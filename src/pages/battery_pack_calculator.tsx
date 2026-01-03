@@ -38,7 +38,17 @@ const CELL_SIZES: CellSizeInfo[] = [
 ];
 
 const BRAND_NAMES = [
-  { id: 'kukirin_g2_max', label: 'Kukirin G2 Max', ah: 2.5 },
+  {
+    id: 'kukirin_g2_max',
+    label: 'Kukirin G2 Max',
+    volt: 3.7,
+    ah: 2.5,
+    series: 13,
+    parallel: 8,
+    height: 7.5,
+    length: 30.5,
+    width: 14.5
+  },
 ];
 
 export default function BatteryPackCalculator() {
@@ -63,11 +73,21 @@ export default function BatteryPackCalculator() {
       setInputs(prev => ({ ...prev, [field]: value }));
     } else if (field === 'brandname') {
       const brand = BRAND_NAMES.find(b => b.id === value);
-      setInputs(prev => ({
-        ...prev,
-        [field]: value,
-        ah: brand ? brand.ah : prev.ah
-      }));
+      if (brand) {
+        setInputs(prev => ({
+          ...prev,
+          [field]: value,
+          volt: brand.volt,
+          ah: brand.ah,
+          series: brand.series,
+          parallel: brand.parallel,
+          height: brand.height,
+          length: brand.length,
+          width: brand.width
+        }));
+      } else {
+        setInputs(prev => ({ ...prev, [field]: value }));
+      }
     } else {
       setInputs(prev => ({ ...prev, [field]: parseFloat(value) || 0 }));
     }
