@@ -113,6 +113,32 @@ export default function BatteryPackCalculator() {
                   <Zap className="w-6 h-6 text-yellow-400" />
                   {t('batterySpecifications')}
                 </h2>
+                <div className="w-1/2 mb-4">
+                  <label className="block text-purple-200 text-sm font-medium mb-2">
+                    {t('cellSize')}
+                  </label>
+                  <div className="relative">
+                    <select
+                      value={inputs.cellSize}
+                      onChange={(e) => handleInputChange('cellSize', e.target.value)}
+                      className="w-full px-4 py-3 bg-white/5 border border-purple-300/30 rounded-lg text-white focus:outline-none focus:ring-2 focus:ring-purple-500 appearance-none cursor-pointer"
+                    >
+                      {CELL_SIZES.map(cellSize => (
+                        <option key={cellSize.id} value={cellSize.id} title={`${cellSize.diameterMm}mm Ø, ${cellSize.heightMm}mm H`}>
+                          {cellSize.label} ({cellSize.diameterMm}mm Ø, {cellSize.heightMm}mm H)
+                        </option>
+                      ))}
+                    </select>
+                    <div className="pointer-events-none absolute right-3 top-11 flex items-center px-2 text-purple-200">
+                      <svg className="fill-current h-4 w-4" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20">
+                        <path d="M9.293 12.95l.707.707L15.657 8l-1.414-1.414L10 10.828 5.757 6.586 4.343 8z" />
+                      </svg>
+                    </div>
+                  </div>
+                  <p className="text-purple-200/60 text-xs mt-3">
+                    {t('cellsFit')}: <span className="text-white font-semibold">{calculateCellsFit()}</span>
+                  </p>
+                </div>
                 <div className="grid grid-cols-2 gap-4">
                   <div>
                     <label className="block text-purple-200 text-sm font-medium mb-2">
@@ -205,36 +231,7 @@ export default function BatteryPackCalculator() {
                 </div>
               </div>
 
-              <div>
-                <h2 className="text-2xl font-bold text-white mb-4 flex items-center gap-2">
-                  <Battery className="w-6 h-6 text-cyan-400" />
-                  {t('cellSizes')}
-                </h2>
-                <div className="relative">
-                  <label className="block text-purple-200 text-sm font-medium mb-2">
-                    {t('cellSize')}
-                  </label>
-                  <select
-                    value={inputs.cellSize}
-                    onChange={(e) => handleInputChange('cellSize', e.target.value)}
-                    className="w-full px-4 py-3 bg-white/5 border border-purple-300/30 rounded-lg text-white focus:outline-none focus:ring-2 focus:ring-purple-500 appearance-none cursor-pointer"
-                  >
-                    {CELL_SIZES.map(cellSize => (
-                      <option key={cellSize.id} value={cellSize.id} title={`${cellSize.diameterMm}mm Ø, ${cellSize.heightMm}mm H`}>
-                        {cellSize.label} ({cellSize.diameterMm}mm Ø, {cellSize.heightMm}mm H)
-                      </option>
-                    ))}
-                  </select>
-                  <div className="pointer-events-none absolute right-3 top-11 flex items-center px-2 text-purple-200">
-                    <svg className="fill-current h-4 w-4" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20">
-                      <path d="M9.293 12.95l.707.707L15.657 8l-1.414-1.414L10 10.828 5.757 6.586 4.343 8z" />
-                    </svg>
-                  </div>
-                </div>
-                <p className="text-purple-200/60 text-xs mt-3">
-                  {t('cellsFit')}: <span className="text-white font-semibold">{calculateCellsFit()}</span>
-                </p>
-              </div>
+
 
               <button
                 onClick={calculate}
