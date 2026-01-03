@@ -454,13 +454,168 @@ export default function BatteryPackCalculator() {
             )}
 
             {results && (
-              <div className="mt-6 bg-purple-500/20 p-4 rounded-xl border border-purple-400/30">
-                <p className="text-purple-200 text-sm mb-2">{t('configuration')}:</p>
-                <p className="text-white font-mono">{inputs.series}S{inputs.parallel}P Pack</p>
-                <p className="text-purple-200 text-xs mt-2">
-                  {inputs.series} {t('cellsInSeriesDesc')} {inputs.parallel} {t('parallelGroupsDesc')}
-                </p>
-              </div>
+              <>
+                <div className="mt-6 bg-purple-500/20 p-4 rounded-xl border border-purple-400/30">
+                  <p className="text-purple-200 text-sm mb-2">{t('configuration')}:</p>
+                  <p className="text-white font-mono">{inputs.series}S{inputs.parallel}P Pack</p>
+                  <p className="text-purple-200 text-xs mt-2">
+                    {inputs.series} {t('cellsInSeriesDesc')} {inputs.parallel} {t('parallelGroupsDesc')}
+                  </p>
+                </div>
+
+                <div className="mt-6">
+                  <h3 className="text-xl font-bold text-white mb-4 text-center">Pack Layout</h3>
+                  <div className="flex items-center justify-center">
+                    {(() => {
+                      const cellSize = CELL_SIZES.find(cs => cs.id === inputs.cellSize);
+                      const cellDiameterCm = cellSize ? cellSize.diameterMm / 10 : 2.1;
+                      const physicalCols = Math.floor(inputs.length / cellDiameterCm);
+                      const physicalRows = Math.floor(inputs.width / cellDiameterCm);
+
+                      // Scale the drawing to fit pack dimensions proportionally
+                      const scaleFactor = 8; // pixels per cm
+                      const packWidthPx = inputs.length * scaleFactor;
+                      const packHeightPx = inputs.width * scaleFactor;
+                      const margin = 40;
+                      const viewBoxWidth = packWidthPx + margin * 2;
+                      const viewBoxHeight = packHeightPx + margin * 2;
+
+                      // Calculate cell spacing based on scaled dimensions
+                      const cellSpacingX = packWidthPx / physicalCols;
+                      const cellSpacingY = packHeightPx / physicalRows;
+                      const cellRadius = Math.min(cellSpacingX, cellSpacingY) * 0.4;
+
+                      return (
+                        <svg
+                          viewBox={`0 0 ${viewBoxWidth} ${viewBoxHeight}`}
+                          className="w-full h-full"
+                          style={{ maxHeight: '400px' }}
+                        >
+                          <defs>
+                            <linearGradient id="packGradient" x1="0%" y1="0%" x2="100%" y2="100%">
+                              <stop offset="0%" style={{ stopColor: '#10b981', stopOpacity: 1 }} />
+                              <stop offset="100%" style={{ stopColor: '#059669', stopOpacity: 1 }} />
+                            </linearGradient>
+                          </defs>
+
+                          {/* Pack outline */}
+                          <rect
+                            x={margin}
+                            y={margin}
+                            width={packWidthPx}
+                            height={packHeightPx}
+                            rx="8"
+                            fill="url(#packGradient)"
+                            stroke="#fff"
+                            strokeWidth="3"
+                            opacity="0.8"
+                          />
+
+                          {/* Draw physical cells */}
+                          {[...Array(physicalRows)].map((_, row) => (
+                            [...Array(physicalCols)].map((_, col) => {
+                              const cellX = margin + col * cellSpacingX + cellSpacingX / 2;
+                              const cellY = margin + row * cellSpacingY + cellSpacingY / 2;
+                              return (
+                                <circle
+                                  key={`physical-cell-${row}-${col}`}
+                                  cx={cellX}
+                                  cy={cellY}
+                                  r={cellRadius}
+                                  fill="#8b5cf6"
+                                  stroke="#fff"
+                                  strokeWidth="1"
+                                  opacity="0.6"
+                                />
+                              );
+                            })
+                          ))}
+
+                          {/* Series connections (red) - horizontal within parallel groups */}
+                          {[...Array(inputs.parallel)].map((_, p) => (
+                            [...Array(inputs.series - 1)].map((_, s) => {
+                              const startX = margin + s * cellSpacingX + cellSpacingX / 2 + cellRadius * 0.7;
+                              const endX = margin + (s + 1) * cellSpacingX + cellSpacingX / 2 - cellRadius * 0.7;
+                              const y = margin + p * cellSpacingY + cellSpacingY / 2 - cellRadius * 0.5;
+                              return (
+                                <line
+                                  key={`series-connection-${p}-${s}`}
+                                  x1={startX}
+                                  y1={y}
+                                  x2={endX}
+                                  y2={y}
+                                  stroke="#ef4444"
+                                  strokeWidth="2"
+                                  strokeLinecap="round"
+                                />
+                              );
+                            })
+                          ))}
+
+                          {/* Parallel connections (blue) - vertical between groups */}
+                          {[...Array(inputs.series)].map((_, s) => (
+                            [...Array(inputs.parallel - 1)].map((_, p) => {
+                              const x = margin + s * cellSpacingX + cellSpacingX / 2;
+                              const startY = margin + p * cellSpacingY + cellSpacingY / 2 + cellRadius * 0.7;
+                              const endY = margin + (p + 1) * cellSpacingY + cellSpacingY / 2 - cellRadius * 0.7;
+                              return (
+                                <line
+                                  key={`parallel-connection-${s}-${p}`}
+                                  x1={x}
+                                  y1={startY}
+                                  x2={x}
+                                  y2={endY}
+                                  stroke="#3b82f6"
+                                  strokeWidth="2"
+                                  strokeLinecap="round"
+                                />
+                              );
+                            })
+                          ))}
+
+                          {/* Dimensions labels */}
+                          <text x={margin + packWidthPx / 2} y={margin - 5} fill="#a78bfa" fontSize="12" textAnchor="middle">
+                            {inputs.length}cm
+                          </text>
+                          <text x={margin - 5} y={margin + packHeightPx / 2} fill="#a78bfa" fontSize="12" textAnchor="middle" transform={`rotate(-90 ${margin - 5} ${margin + packHeightPx / 2})`}>
+                            {inputs.width}cm
+                          </text>
+
+                          {/* Cell count */}
+                          <text x={margin + packWidthPx / 2} y={margin + packHeightPx + 20} fill="#a78bfa" fontSize="12" textAnchor="middle">
+                            Physical: {physicalCols} × {physicalRows} cells
+                          </text>
+                          <text x={margin + packWidthPx / 2} y={margin + packHeightPx + 35} fill="#a78bfa" fontSize="12" textAnchor="middle">
+                            Electrical: {inputs.series}S × {inputs.parallel}P
+                          </text>
+
+                          {/* Legend */}
+                          <g transform={`translate(${margin + packWidthPx / 2 - 60}, ${margin + packHeightPx + 50})`}>
+                            <line x1="0" y1="0" x2="20" y2="0" stroke="#ef4444" strokeWidth="2" strokeLinecap="round" />
+                            <text x="25" y="4" fill="#ef4444" fontSize="10">Series</text>
+                            <line x1="70" y1="0" x2="90" y2="0" stroke="#3b82f6" strokeWidth="2" strokeLinecap="round" />
+                            <text x="95" y="4" fill="#3b82f6" fontSize="10">Parallel</text>
+                          </g>
+
+                          {/* Configuration */}
+                          <text x={margin + packWidthPx / 2} y={margin + packHeightPx + 70} fill="#a78bfa" fontSize="14" fontWeight="bold" textAnchor="middle">
+                            {inputs.series}S {inputs.parallel}P Configuration
+                          </text>
+                        </svg>
+                      );
+                    })()}
+                  </div>
+                  <p className="text-purple-200/70 text-xs mt-2 text-center">
+                    Physical layout: {(() => {
+                      const cellSize = CELL_SIZES.find(cs => cs.id === inputs.cellSize);
+                      const cellDiameterCm = cellSize ? cellSize.diameterMm / 10 : 2.1;
+                      const physicalCols = Math.floor(inputs.length / cellDiameterCm);
+                      const physicalRows = Math.floor(inputs.width / cellDiameterCm);
+                      return `${physicalCols}×${physicalRows} cells`;
+                    })()} | Electrical connections: {inputs.series} cells in series × {inputs.parallel} parallel groups = {inputs.series * inputs.parallel} total cells
+                  </p>
+                </div>
+              </>
             )}
           </div>
         </div>
